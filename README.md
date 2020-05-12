@@ -38,3 +38,5 @@ bash evaluate.sh [YOUR PATH]/ChartDialog-save/s2s_single ./models/seq2seq/output
 ### Pretrained model download
 - seq2seq: https://drive.google.com/open?id=15Pv1IeAas0L1PAqCaDPOqiBvKhFonGft
 
+### Plot Agent Interface
+The plot agent interface is inside models/seq2seq/plot_agent.ipynb
