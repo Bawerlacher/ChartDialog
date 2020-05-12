@@ -1,9 +1,11 @@
 *.ipynb_checkpoints*
 *.DS_Store*
 *__pycache__*
+*.csv*
 ~$*
 
 data
 models/seq2seq/outputs
 models/seq2seq/logs
-
+ChartDialog-data
+ChartDialog-save

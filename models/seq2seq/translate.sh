@@ -20,6 +20,5 @@ python translate.py -model $MODEL_DIR/$VERSION/model.${VERSION}_step_${STEP}.pt 
 -src $DATA_DIR/src.test.txt \
 -tgt $DATA_DIR/tgt.test.txt \
 -output outputs/pred_test_${VERSION}_${STEP}.txt \
--gpu 0
 
 # Remove the '-gpu 0' if running on CPU

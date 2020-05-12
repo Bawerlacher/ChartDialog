@@ -1,0 +1,24 @@
+plot_type bar_plot bar_face_color black bar_orientation vertical bar_width 1 show_error_bar False y_axis_scale linear x_axis_position bottom y_axis_position left font_size medium invert_x_axis False invert_y_axis False
+grid_line_type horizontal
+invert_y_axis True
+bar_width 0.6
+data_series_name Data_Size
+plot_type 3D_surface surface_color blue font_size medium invert_x_axis True invert_y_axis False invert_z_axis False
+line_color different color_map magenta_to_yellow color_bar_orientation horizontal color_bar_length short color_bar_thickness thick
+contour_plot_type lined line_style solid line_width medium color_bar_length long x_axis_scale log y_axis_scale log font_size large
+invert_y_axis False
+plot_type bar_plot bar_face_color red bar_edge_width thin bar_edge_color green bar_orientation vertical bar_width 1 show_error_bar False y_axis_scale linear x_axis_position top y_axis_position left data_series_name Energy font_size medium invert_x_axis False invert_y_axis False grid_line_type horizontal grid_line_color gray grid_line_style dashed grid_line_width very_thin
+show_error_bar True error_bar_cap_size small error_bar_cap_thickness thin error_bar_color green
+error_bar_cap_size medium grid_line_width thin
+marker_size large
+color_bar_length long font_size large
+plot_type pie_chart precision_digits 0 percentage_distance_from_center medium label_distance_from_center near radius medium section_edge_width thin section_edge_color gray font_size medium
+percentage_distance_from_center near label_distance_from_center far radius large
+font_size large
+section_edge_width medium
+font_size medium
+font_size large
+font_size medium
+font_size large
+font_size medium
+font_size large

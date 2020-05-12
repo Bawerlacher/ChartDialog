@@ -38,6 +38,7 @@ def _get_parser():
 
     opts.config_opts(parser)
     opts.translate_opts(parser)
+    print(parser.parse_args())
     return parser
 
 
@@ -45,4 +46,5 @@ if __name__ == "__main__":
     parser = _get_parser()
 
     opt = parser.parse_args()
+    print(parser.parse_args())
     main(opt)
