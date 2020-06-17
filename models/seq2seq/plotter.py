@@ -52,7 +52,8 @@ TUTORIAL_TYPE_GROUPS = [
 # Assume 3rd tutorial polarized
 
 def plotter(
-	x, y=None, z=None, u=None, v=None, c_type=None,		# c_type: the correct type for input data
+	x, y=None, z=None, u=None, v=None,
+	c_type=None,				# c_type: the correct type for input data
 	plot_type=None,				# User specified type
 	# ------- Line -------
 	line_color=None,			# {None, colors...}
@@ -66,7 +67,7 @@ def plotter(
 	marker_interval=None,		# {1, 2, 5}
 
 	# ------- Histogram -------
-	hist_range=(140, 200),		# Fixed to correct value
+	hist_range=None,		# Fixed to correct value
 	number_of_bins=None,		# {6, 8, 10, 12}
 	bar_relative_width=None,	# {0.6, 0.8, 1}, already natural
 	bar_edge_width=0,			# {1, 3}
@@ -133,10 +134,10 @@ def plotter(
 	color_bar_thickness=None,	# {0.1, 0.05, 0.033}, ratio of width vs. length
 
 	# ------- Shared -------
-	# plot_title=None,				# Active: all (plot_type.capitalize() + '\n\n\n')
-	# x_axis_label=None,			# Fixed to 'X': line, hist, scatter, bar, contour, streamline, surface_3d
-	# y_axis_label=None,			# Fixed to 'Y': line, hist, scatter, bar, contour, streamline, surface_3d
-	# z_axis_label=None,			# Fixed to 'Z': surface_3d
+	plot_title=None,			# Active: all (plot_type.capitalize() + '\n\n\n')
+	x_axis_label='X',			# Fixed to 'X': line, hist, scatter, bar, contour, streamline, surface_3d
+	y_axis_label='Y',			# Fixed to 'Y': line, hist, scatter, bar, contour, streamline, surface_3d
+	z_axis_label='Z',			# Fixed to 'Z': surface_3d
 	data_series_name=None,		# Active: line, hist, scatter (but not vary), bar
 	font_size=None,				# {8, 10, 12}; active: all
 	invert_x_axis=False,		# Active: line, hist, scatter, bar, contour, streamline, surface_3d
@@ -168,18 +169,18 @@ def plotter(
 		ax = fig.gca()
 
 	# Dummy data, avoiding error
-	# if y is None:
-	# 	y = x
-	# if z is None:
-	# 	z = np.zeros_like(x)
-	# if u is None:
-	# 	u = np.zeros_like(x)
-	# if v is None:
-	# 	v = np.zeros_like(y)
+	if y is None:
+		y = x
+	if z is None:
+		z = np.zeros_like(x)
+	if u is None:
+		u = np.zeros_like(x)
+	if v is None:
+		v = np.zeros_like(y)
 
-	if plot_type is not None and c_type != plot_type:
-		print('Type error: c_type = {}, plot_type = {}. Forcing plot_type = None'.format(c_type, plot_type))
-		plot_type = None
+	# if plot_type is not None and c_type != plot_type:
+	# 	print('Type error: c_type = {}, plot_type = {}. Forcing plot_type = None'.format(c_type, plot_type))
+	# 	plot_type = None
 
 	# Universal None transforming (for -style, -size, -width)
 	if line_style is None:
@@ -227,12 +228,14 @@ def plotter(
 	elif plot_type == 'histogram':
 		func_kwargs = {
 			'bins' : number_of_bins,
-			'range' : hist_range,
 			'rwidth' : bar_relative_width,
 			'color' : bar_face_color,
 			'linewidth' : bar_edge_width,
 			'edgecolor' : bar_edge_color,
 			'label' : data_series_name}
+
+		if hist_range is not None:
+			func_kwargs['range'] = hist_range
 
 		ax.hist(x, **func_kwargs)
 		artist = Rectangle((0,0), 1, 1, facecolor=bar_face_color, edgecolor=bar_edge_color, linewidth=bar_edge_width)	# Fake artist for legend
@@ -258,8 +261,8 @@ def plotter(
 			'edgecolor' : bar_edge_color,
 			'label' : data_series_name,
 			'error_kw' : {'capsize': error_bar_cap_size, 'capthick': error_bar_cap_thickness, 'ecolor': error_bar_color}}
-		if isinstance(x[0], str):
-			print('X are strings, can\'t have error bar')
+		# if isinstance(x[0], str):
+		# 	print('X are strings, can\'t have error bar')
 
 		if bar_orientation == 'horizontal':
 			# print('--- bar-horizontal ---')
@@ -335,7 +338,13 @@ def plotter(
 		print('Invalid plot type: {}'.format(plot_type))
 		return fig
 
-	if plot_type is not None and color_map is not None:
+	# Colormap
+	colormap_needed = (plot_type in {'matrix_display', 'contour'}) \
+		or (plot_type == 'scatter' and marker_face_color == 'diff') \
+		or (plot_type == 'streamline' and line_color == 'diff') \
+		or (plot_type == 'surface_3d' and surface_color == 'diff')
+
+	if colormap_needed and color_map is not None:
 		func_kwargs = {
 			'orientation': color_bar_orientation,
 			'shrink': color_bar_length,
@@ -344,9 +353,12 @@ def plotter(
 		}
 		fig.colorbar(artist, ax=ax, **func_kwargs)
 
+
+	# Plot title; legend; axis scales and labels
 	if plot_type is not None:
-		plot_title = PLOT_TYPE_V2S[plot_type].capitalize() + '\n\n\n'
-		ax.set_title(plot_title)
+		if plot_title is None:
+			plot_title = PLOT_TYPE_V2S[plot_type].capitalize()
+		ax.set_title(plot_title + '\n\n\n', fontsize=font_size+2)
 
 	if plot_type not in {'pie'}:
 		ax.tick_params(labelsize=font_size)
@@ -370,9 +382,9 @@ def plotter(
 		else:
 			ax.set_yscale('log')
 
-	x_axis_label = 'X'
-	y_axis_label = 'Y'
-	z_axis_label = 'Z'
+	# x_axis_label = 'X'
+	# y_axis_label = 'Y'
+	# z_axis_label = 'Z'
 	if plot_type != 'pie' and (not polarize):
 		ax.set_xlabel(x_axis_label, fontsize=font_size)
 	if plot_type != 'pie' and (not polarize):
@@ -380,6 +392,8 @@ def plotter(
 	if plot_type == 'surface_3d':
 		ax.set_zlabel(z_axis_label, fontsize=font_size)
 
+
+	# Invert axis
 	if invert_x_axis:
 		if plot_type == 'pie':
 			print('Invalid: invert_x_axis set for {}'.format(plot_type))
@@ -402,6 +416,15 @@ def plotter(
 		# else:
 		# 	ax.invert_zaxis()
 
+
+	# Possibly rotate ticklabels
+	ticklabels_rotate_needed = isinstance(x.flatten()[0], str) and (plot_type != 'pie')
+
+	if ticklabels_rotate_needed:
+		ax.tick_params(labelrotation=90)
+
+
+	# Gridlines
 	if plot_type not in {'surface_3d', 'pie', 'matrix_display'}:
 		# Can add grid lines
 		if grid_line_type in {'vertical', 'both'}:
@@ -418,6 +441,8 @@ def plotter(
 		else:
 			ax.set_axisbelow(True)
 
+
+	# Axis positions
 	if (plot_type not in {'surface_3d', 'pie'}) and (not polarize):
 		# Can do axis moving, ticklabels setting
 		if x_axis_position == 'top':
@@ -441,6 +466,8 @@ def plotter(
 	# To solve title cutting-off
 	fig.tight_layout()
 
+
+	# Finalization
 	if save_legend:
 		fig_legend = plt.figure(figsize=(4, 0.5))
 		if legend_possible:
@@ -2021,7 +2048,7 @@ def sample(N, start_id=1, sampler_func=sample_one):
 
 def sample_show(N, sampler_func=sample_one):
 	for i in range(N):
-		data, plotter_kwargs = sampler_func('pie chart')
+		data, plotter_kwargs = sampler_func('scatter plot')
 		print(plotter_kwargs)
 		plotter_kwargs_unnat = plotter_kwargs_unnaturalize(**plotter_kwargs)
 		fig = plotter(**data, **plotter_kwargs_unnat)
