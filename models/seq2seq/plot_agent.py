@@ -191,9 +191,9 @@ class plot_agent:
                 self.plot_param['y_axis_label'] = tit
             else:
                 self.plot_param['plot_title'] = tit
-            return 0;
+            return 0
         else:
-            return -1;
+            return -1
     
     
     def interface(self):
@@ -262,12 +262,12 @@ class plot_agent:
                         print("Invalid input.")
                     con = input("Continue setting labels? [y/N]: ")
                     if con != 'y' and con != 'Y':
-                        break;
+                        break
                 if self.test_mode:
                     self.plotting()
             
             elif ins=='end':
-                break;
+                break
             
             elif ins=='test':
                 self.test_mode = not self.test_mode
@@ -390,7 +390,7 @@ class plot_agent:
         ins = self.__query_help(hint, header, data)
         if '|' not in ins:
             print("Format is not correct. Please try again.")
-            return query_data(hint, header, data)
+            return self.__query_data(hint, header, data)
         r, c = ins.split('|')
         if '-' not in c:
             if c == 'all':
