@@ -1,3 +1,1 @@
-plot_type bar_plot bar_face_color black bar_orientation vertical bar_width 1 show_error_bar False y_axis_scale linear x_axis_position bottom y_axis_position left font_size medium invert_x_axis False invert_y_axis False
-color_map red_to_white_to_blue
-marker_face_color blue bar_edge_width medium
+plot_type bar_plot bar_face_color green bar_edge_width thin bar_edge_color blue bar_orientation vertical bar_width 1 show_error_bar False y_axis_scale linear x_axis_position bottom y_axis_position left font_size medium invert_x_axis False invert_y_axis False

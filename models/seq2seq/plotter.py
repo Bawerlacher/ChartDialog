@@ -168,6 +168,8 @@ def plotter(
 	else:
 		ax = fig.gca()
 
+	x = np.array(x)
+
 	# Dummy data, avoiding error
 	if y is None:
 		y = x
@@ -367,18 +369,21 @@ def plotter(
 
 	if data_series_name is not None:
 		if not legend_possible:
-			print('Invalid: data_series_name given for {}{}'.format(plot_type, '-diff' if plot_type == 'scatter' else ''))
+			# print('Invalid: data_series_name given for {}{}'.format(plot_type, '-diff' if plot_type == 'scatter' else ''))
+			pass
 		else:
 			ax.legend(fontsize=font_size)
 
 	if x_axis_scale == 'log':
 		if (plot_type not in {'line', 'scatter', 'bar', 'contour'}) or (plot_type == 'bar' and bar_orientation == 'vertical'):
-			print('Invalid x_axis_scale: {} for {}{}'.format(x_axis_scale, plot_type, '-' + bar_orientation if plot_type == 'bar' else ''))
+			# print('Invalid x_axis_scale: {} for {}{}'.format(x_axis_scale, plot_type, '-' + bar_orientation if plot_type == 'bar' else ''))
+			pass
 		else:
 			ax.set_xscale('log')
 	if y_axis_scale == 'log':
 		if (plot_type not in {'line', 'scatter', 'bar', 'contour'}) or (plot_type == 'bar' and bar_orientation == 'horizontal'):
-			print('Invalid y_axis_scale: {} for {}{}'.format(y_axis_scale, plot_type, '-' + bar_orientation if plot_type == 'bar' else ''))
+			# print('Invalid y_axis_scale: {} for {}{}'.format(y_axis_scale, plot_type, '-' + bar_orientation if plot_type == 'bar' else ''))
+			pass
 		else:
 			ax.set_yscale('log')
 
