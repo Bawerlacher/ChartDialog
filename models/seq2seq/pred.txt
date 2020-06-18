@@ -1,3 +1,20 @@
-plot_type bar_plot bar_face_color black bar_orientation vertical bar_width 1 show_error_bar False y_axis_scale linear x_axis_position bottom y_axis_position left font_size medium invert_x_axis False invert_y_axis False
-color_map red_to_white_to_blue
-marker_face_color blue bar_edge_width medium
+plot_type line_chart line_style dashed_dots line_width medium line_color black show_error_bar False polarize False x_axis_scale linear y_axis_scale linear x_axis_position bottom y_axis_position left font_size medium invert_x_axis False invert_y_axis False
+grid_line_style dashed
+line_style dotted
+line_width thin
+line_color green
+line_width thick
+line_width medium
+marker_interval 2
+marker_interval 2
+marker_size medium
+marker_size small
+marker_size medium marker_face_color blue
+marker_type diamonds
+marker_size small
+color_bar_length long
+marker_interval 1
+grid_line_style dotted
+grid_line_width very_thin
+grid_line_color red
+grid_line_type horizontal

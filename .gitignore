@@ -1,8 +1,10 @@
 *.ipynb_checkpoints*
 *.DS_Store*
 *__pycache__*
-*.csv*
 ~$*
+
+*.csv*
+!models/seq2seq/time_series_covid19_confirmed_global_simplified.csv
 
 data
 models/seq2seq/outputs

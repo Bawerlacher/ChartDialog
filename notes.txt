@@ -1,0 +1,15 @@
+Update:
+- In plotter(), ignore unapplicable slots (colormap)
+- When xticklabels are text, rotate 90 degrees
+- Remove c_type checking
+- Added params: plot_title, x/y/z_axis_label
+- hist_range no longer compulsory. When it's None, let matplotlib infer
+
+
+TODO:
++ Remove bar_base and hist_range from user data loading
++ Reframe data loading
+
+
+# Bar plot is not performing well; not able to change face color after the first utterance
+

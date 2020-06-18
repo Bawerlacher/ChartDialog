@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import random
 import csv
+import importlib
 
 from params_serialize import *
 from plotter import *
@@ -243,7 +244,7 @@ class plot_agent:
                     self.data = data_got
                     
             elif ins=="load csv":
-                self.data=self.csv_interface()
+                self.data=self.csv_interface_simple()
                     
             elif ins=="load dialog":
                 file_addr=input("What's the path of the dialog file? ")
@@ -470,3 +471,36 @@ class plot_agent:
             data['x'] = tuple(data['x'])
         print("Data generated from the csv file!")
         return data
+
+    def csv_interface_simple(self):
+        csv_addr = input("Please tell me the path of your csv file: ")
+        stats = []
+        with open(csv_addr) as csvfile:
+            reader = csv.DictReader(csvfile)
+            
+            header = reader.fieldnames
+            for row in reader:
+                for r in row.keys():
+                    if row[r].isnumeric() and '.' in row[r]:
+                        row[r] = float(row[r])
+                    elif row[r].isnumeric():
+                        row[r] = int(row[r])
+                stats.append(row)
+        
+        data_keys = ['x', 'y', 'z', 'u', 'v']
+        
+        data = dict()
+        for i in range(len(header)):
+            row_key = header[i]
+            dat = [row[row_key] for row in stats]
+            
+            data_key = data_keys[i]
+            data[data_key] = dat
+            
+            if data_key in ['x', 'y', 'z']:
+                data['{}_axis_label'.format(data_key)] = row_key
+        
+        print("Data loaded from the csv file!")
+        return data
+
+
