@@ -1,19 +1,3 @@
-from __future__ import unicode_literals
-from onmt.utils.logging import init_logger
-from onmt.utils.misc import split_corpus
-from onmt.translate.translator import build_translator
-
-import onmt.opts as opts
-from onmt.utils.parse import ArgumentParser
-
-import matplotlib.pyplot as plt
-import numpy as np
-import random
-import csv
-
-from params_serialize import *
-from plotter import *
-
 class plot_agent:
     
     #################################
@@ -98,8 +82,9 @@ class plot_agent:
         kwargs_unnat = plotter_kwargs_unnaturalize(**self.plot_param)
         try:
             plt.show(plotter(**self.data, **kwargs_unnat))
-        except:
+        except Exception as e:
             print("information not enough for plotting")
+            raise e
         return 0
     
     
@@ -164,7 +149,7 @@ class plot_agent:
             for ins in f:
                 ins = ins.replace('\n', '')
                 if self.test_mode:
-                    print("Input instruction:", ins)
+                    print("Input>:", ins)
                 self.update(self.__natural_lang_translate(ins))
     
     
@@ -176,13 +161,28 @@ class plot_agent:
             for ins in ins_set[:len(ins_set)-1]:
                 ins = ins.split('|| ')[1]
                 if self.test_mode:
-                    print("Input instruction:", ins)
+                    print("Input>:", ins)
                 self.update(self.__natural_lang_translate(ins))
+    
+    
+    # Special instruction: set label and title
+    def setlabel(self, lab):
+        if lab in ['x', 'y', 'title']:
+            tit = input(lab+": ")
+            if lab == 'x':
+                self.plot_param['x_axis_label'] = tit
+            elif lab == 'y':
+                self.plot_param['y_axis_label'] = tit
+            else:
+                self.plot_param['plot_title'] = tit
+            return 0;
+        else:
+            return -1;
     
     
     def interface(self):
         while True:
-            ins = input("Enter your instruction: ")
+            ins = input(">: ")
             if ins=="undo":
                 if self.undo() == -1:
                     print("undo failed.")
@@ -198,8 +198,8 @@ class plot_agent:
             elif ins=="plot":
                 if self.plotting() == -1:
                     print("Plot failed, data missing.")
-                    inq = input("Do you want to generate data? (Y/n): ")
-                    if inq == 'Y' or inq == 'y':
+                    inq = input("Do you want to generate data? [Y/n]: ")
+                    if inq != 'n' and inq != 'N':
                         self.data, label_setting = self.generate_data()
                         if self.data == None:
                             print("Please specify the plot type.")
@@ -239,6 +239,17 @@ class plot_agent:
             elif ins=="load source dialog":
                 self.load_dialog_format(self.src_addr)
             
+            elif ins=="set labels":
+                while True:
+                    lab = input("What label would you like to set? [x/y/title]: ")
+                    if self.setlabel(lab) == -1:
+                        print("Invalid input.")
+                    con = input("Continue setting labels? [y/N]: ")
+                    if con != 'y' and con != 'Y':
+                        break;
+                if self.test_mode:
+                    self.plotting()
+            
             elif ins=='end':
                 break;
             
@@ -256,6 +267,10 @@ class plot_agent:
                 if self.test_mode: 
                     self.plotting()
     
+    
+    #######################
+    ## Data Loading Part ##
+    #######################
     
     def __data_reader(self, data_type, src_addr):
         with open(src_addr) as f:
@@ -430,8 +445,8 @@ class plot_agent:
             else:
                 dat = self.__query_data("Please specify data range [r|c] (229|4-105 denotes row 229 column 4-105)", header, stats)
             data.update({label:dat})
-            con = input("Do you want to continue specify data? [y/n]: ")
-            if con == 'n':
+            con = input("Do you want to continue specify data? [y/N]: ")
+            if con != 'y' and con != 'Y':
                 break
         c_type = input("Please specify your intended chart type [bar/line/pie/streamline/contour/histogram/scatter/surface_3d/matrix_display]")
         data.update({'c_type':c_type})
