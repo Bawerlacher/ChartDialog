@@ -56,23 +56,23 @@ def plotter(
 	c_type=None,				# c_type: the correct type for input data
 	plot_type=None,				# User specified type
 	# ------- Line -------
-	line_color=None,			# {None, colors...}
+	line_color='black',			# {None, colors...}
 	line_style=None,			# {None (''), '-', '--', '-.', ':'}
-	line_width=None,			# {1, 3, 5}
+	line_width=3,				# {1, 3, 5}
 	marker_type=None,			# {None, 'o', 'v', '^', 'D'}
-	marker_size=None,			# {5, 9, 13}
+	marker_size=5,				# {5, 9, 13}
 	marker_edge_width=None,		# {1, 3}
-	marker_edge_color=None,
+	marker_edge_color='black',
 	marker_face_color=None,		# {None, colors...}
 	marker_interval=None,		# {1, 2, 5}
 
 	# ------- Histogram -------
-	hist_range=None,		# Fixed to correct value
-	number_of_bins=None,		# {6, 8, 10, 12}
-	bar_relative_width=None,	# {0.6, 0.8, 1}, already natural
+	hist_range=None,			# Fixed to correct value
+	number_of_bins=6,			# {6, 8, 10, 12}
+	bar_relative_width=1,		# {0.6, 0.8, 1}, already natural
 	bar_edge_width=0,			# {1, 3}
-	bar_edge_color=None,
-	bar_face_color=None,
+	bar_edge_color='black',
+	bar_face_color='black',
 
 	# ------- Scatter -------
 	## marker_type=None,		# {'o', 'v', '^', 'D'}
@@ -80,13 +80,13 @@ def plotter(
 	## marker_edge_width=None,	# {1, 3}
 	## marker_edge_color=None,
 	## marker_face_color=None,	# {colors..., diff}
-	color_map=None,
+	color_map='Reds',
 
 	# ------- Bar -------
 	bar_base=None,				# Fixed to correct value (min - c)
 	bar_orientation='vertical',
-	bar_width=None,				# {0.6, 0.8, 1}, already natural
-	bar_height=None,			# {0.6, 0.8, 1}, already natural
+	bar_width=1,				# {0.6, 0.8, 1}, already natural
+	bar_height=1,			# {0.6, 0.8, 1}, already natural
 	## bar_edge_width=0,		# {1, 3}
 	## bar_edge_color=None,
 	## bar_face_color=None,
@@ -95,9 +95,9 @@ def plotter(
 	## color_map=None,
 
 	# ------- Contour -------
-	contour_plot_type=None,		# {'lined', 'filled'}
+	contour_plot_type='filled',	# {'lined', 'filled'}
 	## color_map=None,
-	number_of_levels=None,		# {6, 10, 15}, natural
+	number_of_levels=6,			# {6, 10, 15}, natural
 	## line_style=None,			# {'-', '--', '-.', ':'}
 	## line_width=0,			# {1, 3, 5}
 
@@ -106,11 +106,11 @@ def plotter(
 	## line_color=None,			# {colors..., diff}
 	## color_map=None,
 	## line_width=None,			# {1, 3, 5, diff}
-	arrow_size=None,			# {1, 3}
-	arrow_style=None,			# {lined('->'), solid('-|>')}
+	arrow_size=1,				# {1, 3}
+	arrow_style='->',			# {lined/curve('->'), solid('-|>')}
 
 	# ------- surface_3d -------
-	surface_color=None,			# {colors..., diff}
+	surface_color='black',		# {colors..., diff}
 	## color_map=None,
 
 	# ------- Pie -------
@@ -118,20 +118,20 @@ def plotter(
 	precision_digits=0,			# {0, 1, 2, 3}
 	percentage_distance_from_center=0.6,	# {0.45, 0.6, 0.75}
 	label_distance_from_center=1.1,			# {1.1, 1.25}
-	radius=None,				# {0.75, 1, 1.25}
+	radius=1,					# {0.75, 1, 1.25}
 	section_edge_width=None,	# {None, 1, 3}
-	section_edge_color=None,
+	section_edge_color='black',
 
 	# ------- Errorbar -------
 	show_error_bar=False,
-	error_bar_cap_size=0,		# {3, 6, 10}
-	error_bar_cap_thickness=0,	# {1, 3}
-	error_bar_color=None,
+	error_bar_cap_size=3,		# {3, 6, 10}
+	error_bar_cap_thickness=1,	# {1, 3}
+	error_bar_color='black',
 
 	# ------- Colorbar -------
 	color_bar_orientation='vertical',
-	color_bar_length=None,		# {0.8, 1}, ratio of length vs. plot height/width
-	color_bar_thickness=None,	# {0.1, 0.05, 0.033}, ratio of width vs. length
+	color_bar_length=0.8,		# {0.8, 1}, ratio of length vs. plot height/width
+	color_bar_thickness=0.033,	# {0.1, 0.05, 0.033}, ratio of width vs. length
 
 	# ------- Shared -------
 	plot_title=None,			# Active: all (plot_type.capitalize() + '\n\n\n')
@@ -139,15 +139,15 @@ def plotter(
 	y_axis_label='Y',			# Fixed to 'Y': line, hist, scatter, bar, contour, streamline, surface_3d
 	z_axis_label='Z',			# Fixed to 'Z': surface_3d
 	data_series_name=None,		# Active: line, hist, scatter (but not vary), bar
-	font_size=None,				# {8, 10, 12}; active: all
+	font_size=10,				# {8, 10, 12}; active: all
 	invert_x_axis=False,		# Active: line, hist, scatter, bar, contour, streamline, surface_3d
 	invert_y_axis=False,		# Active: line, hist, scatter, bar, contour, streamline, surface_3d
 	invert_z_axis=False,		# Active: surface_3d
 	## Grid lines: active: line, histogram, scatter, bar, contour, streamline
 	grid_line_type=None,		# {None, 'horizontal', 'vertical', 'both'} -> Primary
-	grid_line_color=None,		# {colors..., favor black & gray}
-	grid_line_style=None,		# {'-', '--', '-.', ':'}
-	grid_line_width=None,		# {0.5, 1}
+	grid_line_color='black',	# {colors..., favor black & gray}
+	grid_line_style='-',		# {'-', '--', '-.', ':'}
+	grid_line_width=0.5,		# {0.5, 1}
 	## Axis position: active: line, histogram, scatter, bar, imshow, contour, streamline
 	x_axis_position='bottom',
 	y_axis_position='left',
