@@ -28,7 +28,7 @@ class plot_agent:
         self.plot_param = deserialize_single_1(self.non_tpspec)
         self.undo_stack = []
         self.redo_stack = []
-        self.test_mode = True
+        self.test_mode = False
         self.src_addr = src_addr
         random.seed(2)
     
@@ -177,8 +177,7 @@ class plot_agent:
             ins_set = random.choice(all_ins).split('\n')
             for ins in ins_set[:len(ins_set)-1]:
                 ins = ins.split('|| ')[1]
-                if self.test_mode:
-                    print("Input>:", ins)
+                print("Input>:", ins)
                 self.update(self.__natural_lang_translate(ins))
     
     
@@ -355,7 +354,7 @@ class plot_agent:
                     else:
                         dimen[cur_dim].append([float(d) for d in line.split(" ")])
                 return {'x':np.array(dimen[0]), 'y':np.array(dimen[1]), 'u':np.array(dimen[2]),
-                        'y':np.array(dimen[3]), 'z':np.array(dimen[4]), 'c_type':data_type}
+                        'v':np.array(dimen[3]), 'z':np.array(dimen[4]), 'c_type':data_type}
 
             # data type not identified
             else:
@@ -499,6 +498,9 @@ class plot_agent:
             
             if data_key in ['x', 'y', 'z']:
                 data['{}_axis_label'.format(data_key)] = row_key
+
+            title = csv_addr.split('/')[-1].split('.')[0]
+            data['plot_title'] = title
         
         print("Data loaded from the csv file!")
         return data

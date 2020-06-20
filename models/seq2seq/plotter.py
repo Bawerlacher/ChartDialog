@@ -11,6 +11,8 @@ from collections import OrderedDict
 
 import argparse
 
+from matplotlib.ticker import MaxNLocator
+
 '''
 Param name design: natural name k_nat = k.capitalize().split('_')
 About None:
@@ -427,6 +429,7 @@ def plotter(
 
 	if ticklabels_rotate_needed:
 		ax.tick_params(labelrotation=90)
+		ax.xaxis.set_major_locator(MaxNLocator(nbins=40))
 
 
 	# Gridlines
