@@ -11,6 +11,7 @@ import numpy as np
 import random
 import csv
 import importlib
+from nltk import word_tokenize
 
 from params_serialize import *
 from plotter import *
@@ -53,7 +54,7 @@ class plot_agent:
     def __natural_lang_translate(self, order):
         text = order
         if "||" not in text:
-            text = [serialize_single_1(self.plot_param) + " || " + order]
+            text = [serialize_single_1(self.plot_param).lower() + " || " + " ".join(word_tokenize(order.lower()))]
         out = self.translator.translate(src=text, batch_size=1)
         if self.test_mode:
             print("Delta TPS:", deserialize_single_1(out[1][0][0]))
@@ -66,25 +67,25 @@ class plot_agent:
     
     
     def generate_data(self):
-        self.__formalize_param()
-        if self.plot_param['plot_type'] == 'line chart':
-            return Line_data_sampler(**self.plot_param)
-        elif self.plot_param['plot_type'] == 'histogram':
-            return Histogram_data_sampler(**self.plot_param)
-        elif self.plot_param['plot_type'] == 'scatter plot':
-            return Scatter_data_sampler(**self.plot_param)
-        elif self.plot_param['plot_type'] == 'bar plot':
-            return Bar_data_sampler(**self.plot_param)
-        elif self.plot_param['plot_type'] == 'matrix display':
-            return Matrix_display_data_sampler(**self.plot_param)
-        elif self.plot_param['plot_type'] == 'contour plot':
-            return Contour_data_sampler(**self.plot_param)
-        elif self.plot_param['plot_type'] == 'streamline plot':
-            return Streamline_data_sampler(**self.plot_param)
-        elif self.plot_param['plot_type'] == '3D surface':
-            return Surface_3d_data_sampler(**self.plot_param)
-        elif self.plot_param['plot_type'] == 'pie chart':
-            return Pie_data_sampler(**self.plot_param)
+        plot_param, _ = self.__formalize_param()
+        if plot_param['plot_type'] == 'line chart':
+            return Line_data_sampler(**plot_param)
+        elif plot_param['plot_type'] == 'histogram':
+            return Histogram_data_sampler(**plot_param)
+        elif plot_param['plot_type'] == 'scatter plot':
+            return Scatter_data_sampler(**plot_param)
+        elif plot_param['plot_type'] == 'bar plot':
+            return Bar_data_sampler(**plot_param)
+        elif plot_param['plot_type'] == 'matrix display':
+            return Matrix_display_data_sampler(**plot_param)
+        elif plot_param['plot_type'] == 'contour plot':
+            return Contour_data_sampler(**plot_param)
+        elif plot_param['plot_type'] == 'streamline plot':
+            return Streamline_data_sampler(**plot_param)
+        elif plot_param['plot_type'] == '3D surface':
+            return Surface_3d_data_sampler(**plot_param)
+        elif plot_param['plot_type'] == 'pie chart':
+            return Pie_data_sampler(**plot_param)
         else:
             return (None, None)
     
@@ -94,32 +95,39 @@ class plot_agent:
             return -1
         
         # formalize the plot_param
-        self.__formalize_param()
+        _, plot_param = self.__formalize_param()
         
-        kwargs_unnat = plotter_kwargs_unnaturalize(**self.plot_param)
+        kwargs_unnat = plotter_kwargs_unnaturalize(**plot_param)
         try:
             plt.show(plotter(**self.data, **kwargs_unnat))
         except Exception as e:
-            print("information not enough for plotting")
+            print("Plot Failed: ", e)
             raise e
         return 0
     
     
-    ## deserilize will turn every boolean, numeric and None-type value into string
-    ## which can undermine plotting
+    ## deserilize will turn every boolean, numeric and None-type value into string, which can undermine plotting.
+    ## 'changed' only includes properties produced by the model, whereas 'full_form' includes all TPSpecs properties.
     def __formalize_param(self):
-        for k in self.plot_param.keys():
-            if type(self.plot_param[k]) == str:
-                if self.plot_param[k].lower() == 'none':
-                    self.plot_param[k] = None
-                elif self.plot_param[k].isnumeric() and ('.' in self.plot_param[k]):
-                    self.plot_param[k] = float(self.plot_param[k])
-                elif self.plot_param[k].isnumeric():
-                    self.plot_param[k] = int(self.plot_param[k])
-                elif self.plot_param[k].lower() == 'true':
-                    self.plot_param[k] = True
-                elif self.plot_param[k].lower() == 'false':
-                    self.plot_param[k] = False
+        full_form = self.plot_param.copy()
+        changed = OrderedDict()
+        for k in full_form.keys():
+            if full_form[k].lower() == 'none':
+                full_form[k] = None
+            elif full_form[k].isnumeric() and ('.' in full_form[k]):
+                full_form[k] = float(full_form[k])
+            elif full_form[k].isnumeric():
+                full_form[k] = int(full_form[k])
+            elif full_form[k].lower() == 'true':
+                full_form[k] = True
+            elif full_form[k].lower() == 'false':
+                full_form[k] = False
+            
+            if self.plot_param[k] != 'none':
+                changed[k] = full_form[k]
+        
+        return full_form, changed
+                    
     
     
     ########################
@@ -155,8 +163,9 @@ class plot_agent:
     def __param_print(self):
         tmp = []
         for k in self.plot_param.keys():
-            if self.plot_param[k] != None and self.plot_param[k] != "none":
-                tmp.append((k, self.plot_param[k]))
+            # if self.plot_param[k] != None and self.plot_param[k] != "none":
+            #     tmp.append((k, self.plot_param[k]))
+            tmp.append((k, self.plot_param[k]))
         print(tmp)
     
 
@@ -202,14 +211,12 @@ class plot_agent:
             if ins=="undo":
                 if self.undo() == -1:
                     print("undo failed.")
-                if self.test_mode:
-                    self.plotting()
+                    continue
             
             elif ins=="redo":
                 if self.redo() == -1:
                     print("redo failed.")
-                if self.test_mode:
-                    self.plotting()
+                    continue
                     
             elif ins=="plot":
                 if self.plotting() == -1:
@@ -222,16 +229,19 @@ class plot_agent:
                         else:
                             self.update(label_setting)
                             self.plotting()
+                continue
             
             elif ins=="generate data":
                 self.data, label_setting = self.generate_data()
                 if self.data == None:
                     print("Data generation failed. Please specify the plot type.")
+                    continue
                 else:
                     self.update(label_setting)
             
             elif ins=="print param":
                 self.__param_print()
+                continue
             
             elif ins=="load data":
                 data_type=input("Enter the type of your data: ")
@@ -239,6 +249,7 @@ class plot_agent:
                 data_got = self.__data_reader(data_type, data_addr)
                 if data_got is None:
                     print("Data loading failed")
+                    continue
                 else:
                     self.data = data_got
                     
@@ -250,7 +261,8 @@ class plot_agent:
                 try:
                     self.load_dialog(file_addr)
                 except FileNotFoundError:
-                    print("It seems I can't find your dialog file with the given path.")
+                    print("Can't find your dialog file with the given path.")
+                    continue
                     
             elif ins=="load source dialog":
                 self.load_dialog_format(self.src_addr)
@@ -263,14 +275,13 @@ class plot_agent:
                     con = input("Continue setting labels? [y/N]: ")
                     if con != 'y' and con != 'Y':
                         break
-                if self.test_mode:
-                    self.plotting()
             
             elif ins=='end':
                 break
             
             elif ins=='test':
                 self.test_mode = not self.test_mode
+                continue
             
             elif ins=='reset':
                 self.data = None
@@ -280,8 +291,13 @@ class plot_agent:
             
             else:
                 self.update(self.__natural_lang_translate(ins))
-                if self.test_mode: 
-                    self.plotting()
+            
+            if self.data is not None:
+                self.plotting()
+                # try:
+                #     self.plotting()
+                # except Exception:
+                #     print("Failed to plot with current information")
     
     
     #######################
