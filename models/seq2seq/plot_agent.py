@@ -29,6 +29,8 @@ class plot_agent:
         self.plot_param = deserialize_single_1(self.non_tpspec)
         self.undo_stack = []
         self.redo_stack = []
+        self.source_set = []
+        self.source_type = dict()
         self.test_mode = False
         self.src_addr = src_addr
         random.seed(2)
@@ -102,6 +104,9 @@ class plot_agent:
             plt.show(plotter(**self.data, **kwargs_unnat))
         except Exception as e:
             print("Plot Failed: ", e)
+            c, f = self.__formalize_param()
+            print(c)
+            print(f)
             raise e
         return 0
     
@@ -114,8 +119,9 @@ class plot_agent:
         for k in full_form.keys():
             if full_form[k].lower() == 'none':
                 full_form[k] = None
-            elif full_form[k].isnumeric() and ('.' in full_form[k]):
-                full_form[k] = float(full_form[k])
+            elif '.' in full_form[k]:
+                if full_form[k].split('.')[0].isnumeric() and full_form[k].split('.')[1].isnumeric():
+                    full_form[k] = float(full_form[k])
             elif full_form[k].isnumeric():
                 full_form[k] = int(full_form[k])
             elif full_form[k].lower() == 'true':
@@ -133,6 +139,13 @@ class plot_agent:
     ########################
     #### Interface Part ####
     ########################
+
+    def reset(self):
+        self.data = None
+        self.plot_param = deserialize_single_1(self.non_tpspec)
+        self.undo_stack = []
+        self.redo_stack = []
+    
     
     def undo(self):
         if len(self.undo_stack) == 0:
@@ -180,14 +193,47 @@ class plot_agent:
     
     
     # load a dialog from a training/test file:
-    def load_dialog_format(self, file_addr):
-        with open(file_addr) as f:
-            all_ins = f.read().split(self.non_tpspec)
-            ins_set = random.choice(all_ins).split('\n')
-            for ins in ins_set[:len(ins_set)-1]:
-                ins = ins.split('|| ')[1]
-                print("Input>:", ins)
-                self.update(self.__natural_lang_translate(ins))
+    def load_dialog_format(self, file_addr, p_type):
+        self.reset()
+        if len(self.source_set) == 0:   # load dataset
+            print("Loading source file...")
+            with open(file_addr) as f:
+                all_ins = f.read().split(self.non_tpspec)
+            for ins_set in all_ins:
+                if len(ins_set) == 0: continue
+                ins_set = ins_set.split('\n')[:-1]
+                refine_ins = [ins.split('|| ')[1] for ins in ins_set]
+                self.source_set.append(refine_ins)
+
+                # identify the plot type of the sample
+                if len(ins_set) == 1: 
+                    # only one instruction in the sample, can't identify by tps input
+                    delt = self.__natural_lang_translate(refine_ins[0])
+                    if "plot_type" in delt:
+                        plot_type = delt["plot_type"].lower()
+                    # If there is no plot type output from the model, not possible to plot it.
+                else:
+                    plot_type = deserialize_single_1(ins_set[-1].split(' ||')[0])["plot_type"]
+                
+                # bar plot/line chart/pie chart/streamline plot/contour plot/histogram/scatter plot/3D surface/matrix display
+                if plot_type not in self.source_type:
+                    self.source_type[plot_type] = []
+                self.source_type[plot_type].append(refine_ins)
+            
+            # for key in self.source_type.keys():
+            #     print(key+": "+str(len(self.source_type[key])))
+            print("Source file loading done. \n")
+
+        # select a sample
+        if p_type in self.source_type.keys():
+            ins_set = random.choice(self.source_type[p_type])
+        else:
+            ins_set = random.choice(self.source_set)
+        for ins in ins_set:
+            print("Input>:", ins)
+            self.update(self.__natural_lang_translate(ins))
+        self.data, label_setting = self.generate_data()
+        self.update(label_setting)
     
     
     # Special instruction: set label and title
@@ -265,7 +311,14 @@ class plot_agent:
                     continue
                     
             elif ins=="load source dialog":
-                self.load_dialog_format(self.src_addr)
+                p_type = input("Do you want to specify plot type? ")
+                while True:
+                    self.load_dialog_format(self.src_addr, p_type)
+                    self.plotting()
+                    inp = input("Continue? [Y/n]: ")
+                    if inp == "n" or inp == "N":
+                        break
+                continue
             
             elif ins=="set labels":
                 while True:
@@ -284,10 +337,7 @@ class plot_agent:
                 continue
             
             elif ins=='reset':
-                self.data = None
-                self.plot_param = deserialize_single_1(self.non_tpspec)
-                self.undo_stack = []
-                self.redo_stack = []
+                self.reset()
             
             else:
                 self.update(self.__natural_lang_translate(ins))

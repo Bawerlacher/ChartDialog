@@ -429,6 +429,7 @@ def plotter(
 
 	if ticklabels_rotate_needed:
 		ax.tick_params(labelrotation=90)
+		# set the maximum density of x labels
 		ax.xaxis.set_major_locator(MaxNLocator(nbins=40))
 
 
