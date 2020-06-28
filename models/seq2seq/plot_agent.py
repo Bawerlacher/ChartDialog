@@ -193,7 +193,7 @@ class plot_agent:
     
     
     # load a dialog from a training/test file:
-    def load_dialog_format(self, file_addr, p_type):
+    def load_dialog_format(self, file_addr, p_type, step):
         self.reset()
         if len(self.source_set) == 0:   # load dataset
             print("Loading source file...")
@@ -229,11 +229,22 @@ class plot_agent:
             ins_set = random.choice(self.source_type[p_type])
         else:
             ins_set = random.choice(self.source_set)
+        
         for ins in ins_set:
-            print("Input>:", ins)
             self.update(self.__natural_lang_translate(ins))
-        self.data, label_setting = self.generate_data()
-        self.update(label_setting)
+
+        self.data, _ = self.generate_data()
+        
+        if not step:
+            for ins in ins_set:
+                print("Input>:", ins)
+            self.plotting()
+        else:
+            self.plot_param = deserialize_single_1(self.non_tpspec)
+            for ins in ins_set:
+                print("Input>:", ins)
+                self.update(self.__natural_lang_translate(ins))
+                self.plotting()
     
     
     # Special instruction: set label and title
@@ -312,9 +323,13 @@ class plot_agent:
                     
             elif ins=="load source dialog":
                 p_type = input("Do you want to specify plot type? ")
+                step = input("Do you want to see the update on the plot after each turn in the dialog? [y/N]")
+                if step == 'Y' or step == 'y':
+                    step = True
+                else:
+                    step = False
                 while True:
-                    self.load_dialog_format(self.src_addr, p_type)
-                    self.plotting()
+                    self.load_dialog_format(self.src_addr, p_type, step)
                     inp = input("Continue? [Y/n]: ")
                     if inp == "n" or inp == "N":
                         break
