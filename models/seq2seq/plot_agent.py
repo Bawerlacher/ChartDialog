@@ -254,11 +254,11 @@ class plot_agent:
         if lab in ['x', 'y', 'title']:
             tit = input(lab+": ")
             if lab == 'x':
-                self.plot_param['x_axis_label'] = tit
+                self.data['x_axis_label'] = tit
             elif lab == 'y':
-                self.plot_param['y_axis_label'] = tit
+                self.data['y_axis_label'] = tit
             else:
-                self.plot_param['plot_title'] = tit
+                self.data['plot_title'] = tit
             return 0
         else:
             return -1
@@ -324,7 +324,7 @@ class plot_agent:
                     continue
                     
             elif ins=="load source dialog":
-                self.p_type = input("Do you want to specify plot type? [bar plot/line chart/pie chart/streamline plot/contour plot/histogram/scatter plot/3D surface/matrix display/NO]")
+                self.p_type = input("Do you want to specify plot type? [bar plot/line chart/pie chart/streamline plot/contour plot/histogram/scatter plot/3d surface/matrix display/NO]").lower()
                 step = input("Do you want to see the update on the plot after each turn in the dialog? [y/N]")
                 if step == 'Y' or step == 'y':
                     self.step = True
@@ -334,10 +334,9 @@ class plot_agent:
                 continue
 
             elif ins == "next":
-                if self.p_type is None and self.step is None:
-                    continue
-                else:
+                if self.p_type is not None and self.step is not None:
                     self.load_dialog_format(self.src_addr, self.p_type, self.step)
+                continue
             
             elif ins=="set labels":
                 while True:
