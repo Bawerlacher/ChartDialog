@@ -31,6 +31,8 @@ class plot_agent:
         self.redo_stack = []
         self.source_set = []
         self.source_type = dict()
+        self.step = None
+        self.p_type = None
         self.test_mode = False
         self.src_addr = src_addr
         random.seed(2)
@@ -322,18 +324,20 @@ class plot_agent:
                     continue
                     
             elif ins=="load source dialog":
-                p_type = input("Do you want to specify plot type? ")
+                self.p_type = input("Do you want to specify plot type? [bar plot/line chart/pie chart/streamline plot/contour plot/histogram/scatter plot/3D surface/matrix display/NO]")
                 step = input("Do you want to see the update on the plot after each turn in the dialog? [y/N]")
                 if step == 'Y' or step == 'y':
-                    step = True
+                    self.step = True
                 else:
-                    step = False
-                while True:
-                    self.load_dialog_format(self.src_addr, p_type, step)
-                    inp = input("Continue? [Y/n]: ")
-                    if inp == "n" or inp == "N":
-                        break
+                    self.step = False
+                self.load_dialog_format(self.src_addr, self.p_type, self.step)
                 continue
+
+            elif ins == "next":
+                if self.p_type is None and self.step is None:
+                    continue
+                else:
+                    self.load_dialog_format(self.src_addr, self.p_type, self.step)
             
             elif ins=="set labels":
                 while True:
