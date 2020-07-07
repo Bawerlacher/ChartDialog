@@ -189,8 +189,7 @@ class plot_agent:
         with open(file_addr) as f:
             for ins in f:
                 ins = ins.replace('\n', '')
-                if self.test_mode:
-                    print("Input>:", ins)
+                print("Input>:", ins)
                 self.update(self.__natural_lang_translate(ins))
     
     
